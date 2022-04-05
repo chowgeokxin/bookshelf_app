@@ -24,7 +24,7 @@ class BookShelfController extends Controller
         if(auth()->user()){
             return view('bookshelf.create');
         }else{
-            abort(401);
+            return redirect()->route('bookshelf.index');
         }
     }
 
@@ -56,7 +56,8 @@ class BookShelfController extends Controller
 
             }
         }else{
-            abort(401);
+            // abort(401);
+            return redirect()->route('bookshelf.index');
         }
     }
 
@@ -71,7 +72,7 @@ class BookShelfController extends Controller
             }
             return redirect()->route('bookshelf.index');
         }else{
-            abort(401);
+            return redirect()->route('bookshelf.index');
         }
         
     }
@@ -112,7 +113,8 @@ class BookShelfController extends Controller
             }
             return redirect()->route('bookshelf.index');
         }else{
-            abort(401);
+            // abort(401);
+            return redirect()->route('bookshelf.index');
         }
         
     }
@@ -214,7 +216,8 @@ class BookShelfController extends Controller
             }
             return redirect()->route('bookshelf.index');
         }else{
-            abort(401);
+            return redirect()->route('bookshelf.index');
+            // abort(401);
         }
         
     }
