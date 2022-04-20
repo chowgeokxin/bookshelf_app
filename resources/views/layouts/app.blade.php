@@ -50,6 +50,7 @@
 <body>
 <div class="wrapper">
     @include('layouts.header')
+    @if(auth()->user())
         
     <aside class="col-12 p-0 bg-dark flex-shrink-1 h-100 main-sidebar">
         <nav class="navbar navbar-expand navbar-dark bg-dark flex-md-column flex-row align-items-start py-2">
@@ -77,7 +78,8 @@
             </ul>
         </div>
         </nav>
-    </aside>      
+    </aside>            
+    @endif
 
     <div class="main-content h-100" style="margin-left: 280px; margin-top:40px">
 
