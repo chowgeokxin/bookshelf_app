@@ -64,12 +64,10 @@
                     <a class="nav-link pl-0" href="#"><i class="bi bi-book"></i>
                     <span>BookShelf</span></a>
                     <ul>
-                        @if(auth()->user())
                         <li class="nav-item">
                             <a class="nav-link pl-0" href="{{ route('bookshelf.create') }}">
                             <span>Add New Book</span></a>
                         </li>
-                        @endif
                         <li class="nav-item">
                             <a class="nav-link pl-0" href="{{ route('bookshelf.index') }}">
                             <span>Listing</span></a>
@@ -79,7 +77,7 @@
             </ul>
         </div>
         </nav>
-    </aside>            
+    </aside>      
 
     <div class="main-content h-100" style="margin-left: 280px; margin-top:40px">
 

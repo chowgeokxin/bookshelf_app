@@ -21,17 +21,53 @@ class BookShelfController extends Controller
     
     public function create()
     {
-        if(auth()->user()){
-            return view('bookshelf.create');
-        }else{
-            return redirect()->route('bookshelf.index');
-        }
+        return view('bookshelf.create');
     }
 
     public function store(Request $request)
     {
-        if(auth()->user()){
+        $result = "Unable to Submit. Please Try Again.";
 
+        $request->validate([
+            'title' => 'required',
+            'description' => 'max:500',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $bookshelf = new Bookshelf();
+            $bookshelf->user_id = auth()->id();
+            $bookshelf->title = $request->input('title');
+            $bookshelf->description = $request->input('description');
+            $bookshelf->save();
+            DB::commit();
+            $request->session()->flash('success', 'Record Saved Successfully');
+
+            return redirect()->route('bookshelf.index');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput();
+
+        }            
+    }
+
+    public function show(Request $request, $id)
+    {
+        $data = BookShelf::find($id);
+        if($data){
+            return view('bookshelf.show', compact('data'));
+        }else{
+            $request->session()->flash('fail', 'Record not found');
+        }
+        return redirect()->route('bookshelf.index');
+        
+    }
+
+    public function update(Request $request, $id)
+    {
+        $bookshelf = BookShelf::find($id);
+
+        if($bookshelf){
             $result = "Unable to Submit. Please Try Again.";
 
             $request->validate([
@@ -41,81 +77,26 @@ class BookShelfController extends Controller
 
             DB::beginTransaction();
             try {
-                $bookshelf = new Bookshelf();
-                $bookshelf->user_id = auth()->id();
                 $bookshelf->title = $request->input('title');
                 $bookshelf->description = $request->input('description');
+                $bookshelf->is_read = $request->has('is_read') ? '1' : '0';
                 $bookshelf->save();
                 DB::commit();
                 $request->session()->flash('success', 'Record Saved Successfully');
-
-                return redirect()->route('bookshelf.index');
+    
+                return redirect()->route('bookshelf.show',['id'=>$id]);
             } catch (\Exception $e) {
+                return $e;
                 DB::rollBack();
+                $request->session()->flash('fail', $result);
+
                 return redirect()->back()->withInput();
-
             }
+            
         }else{
-            // abort(401);
-            return redirect()->route('bookshelf.index');
+            $request->session()->flash('fail', 'Record Not Found');
         }
-    }
-
-    public function show(Request $request, $id)
-    {
-        if(auth()->user()){
-            $data = BookShelf::find($id);
-            if($data){
-                return view('bookshelf.show', compact('data'));
-            }else{
-                $request->session()->flash('fail', 'Record not found');
-            }
-            return redirect()->route('bookshelf.index');
-        }else{
-            return redirect()->route('bookshelf.index');
-        }
-        
-    }
-
-    public function update(Request $request, $id)
-    {
-        if(auth()->user()){
-            $bookshelf = BookShelf::find($id);
-
-            if($bookshelf){
-                $result = "Unable to Submit. Please Try Again.";
-
-                $request->validate([
-                    'title' => 'required',
-                    'description' => 'max:500',
-                ]);
-
-                DB::beginTransaction();
-                try {
-                    $bookshelf->title = $request->input('title');
-                    $bookshelf->description = $request->input('description');
-                    $bookshelf->is_read = $request->has('is_read') ? '1' : '0';
-                    $bookshelf->save();
-                    DB::commit();
-                    $request->session()->flash('success', 'Record Saved Successfully');
-        
-                    return redirect()->route('bookshelf.show',['id'=>$id]);
-                } catch (\Exception $e) {
-                    return $e;
-                    DB::rollBack();
-                    $request->session()->flash('fail', $result);
-
-                    return redirect()->back()->withInput();
-                }
-                
-            }else{
-                $request->session()->flash('fail', 'Record Not Found');
-            }
-            return redirect()->route('bookshelf.index');
-        }else{
-            // abort(401);
-            return redirect()->route('bookshelf.index');
-        }
+        return redirect()->route('bookshelf.index');
         
     }
 
@@ -203,22 +184,17 @@ class BookShelfController extends Controller
     }
 
     public function delete(Request $request, $id){
-        if(user()->auth()){
-            $bookshelf = BookShelf::find($id);
+        $bookshelf = BookShelf::find($id);
 
-            if ($bookshelf) {
-    
-                $bookshelf->delete();
-    
-                $request->session()->flash('success', 'Record Deleted Successfully');
-            } else {
-                $request->session()->flash('fail', 'Record Not Found');
-            }
-            return redirect()->route('bookshelf.index');
-        }else{
-            return redirect()->route('bookshelf.index');
-            // abort(401);
+        if ($bookshelf) {
+
+            $bookshelf->delete();
+
+            $request->session()->flash('success', 'Record Deleted Successfully');
+        } else {
+            $request->session()->flash('fail', 'Record Not Found');
         }
+        return redirect()->route('bookshelf.index');            
         
     }
 

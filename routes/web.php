@@ -13,19 +13,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('bookshelf.index');
-    // return redirect(\route('dashboard'));
-});
 
 Auth::routes();
 
+Route::get('logout', [App\Http\Controllers\Auth\LoginController::class, 'logout']);
 
-Route::get('/home', [App\Http\Controllers\BookShelfController::class, 'index'])->name('bookshelf.index');
-Route::post('new', [App\Http\Controllers\BookShelfController::class, 'store'])->name('bookshelf.store');
-Route::get('new', [App\Http\Controllers\BookShelfController::class, 'create'])->name('bookshelf.create');
-Route::get('book/{id}', [App\Http\Controllers\BookShelfController::class, 'show'])->name('bookshelf.show');
-Route::put('book/{id}', [App\Http\Controllers\BookShelfController::class, 'update'])->name('bookshelf.update');
-Route::delete('book/{id}', [App\Http\Controllers\BookShelfController::class, 'delete'])->name('bookshelf.delete');
+Route::group(['middleware' => ['auth']], function() {
+    Route::get('/home', [App\Http\Controllers\BookShelfController::class, 'index'])->name('bookshelf.index');
+    Route::post('new', [App\Http\Controllers\BookShelfController::class, 'store'])->name('bookshelf.store');
+    Route::get('new', [App\Http\Controllers\BookShelfController::class, 'create'])->name('bookshelf.create');
+    Route::get('book/{id}', [App\Http\Controllers\BookShelfController::class, 'show'])->name('bookshelf.show');
+    Route::put('book/{id}', [App\Http\Controllers\BookShelfController::class, 'update'])->name('bookshelf.update');
+    Route::delete('book/{id}', [App\Http\Controllers\BookShelfController::class, 'delete'])->name('bookshelf.delete');
 
-Route::match(['get', 'post'], 'get', [App\Http\Controllers\BookShelfController::class, 'get']);
+    Route::match(['get', 'post'], 'get', [App\Http\Controllers\BookShelfController::class, 'get']);
+});
